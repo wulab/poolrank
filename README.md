@@ -1,14 +1,18 @@
-Oozou PoolRank
-==============
+PoolRank
+========
 
-Pool game matchmaking, score keeping and player ranking.
+PoolRank generates a round-robin tournament matches from a player list and
+saves it to a CSV file which you can use to keep track of your match result.
+The results will be gathered to create a standings table that show how well
+you play comparing to other players. It also displays past results and
+suggests remaining matches until all games are being played out.
 
 Getting Started
 ---------------
 
 Clone the PoolRank repo at the command prompt:
 
-    $ git clone git://github.com/oozou/poolrank.git
+    $ git clone https://github.com/wulab/poolrank.git
 
 Change directory to `poolrank` and create a config file:
 
@@ -31,16 +35,16 @@ and regenerate a new set of matches by:
 Please beware that this will remove any previous result. If you want to update
 the list during a tournament, please backup `pool.csv` file before doing so.
 
-Recording Results
------------------
+Match Results
+-------------
 
-PoolRank reads game results from `pool.csv`. It will be generated the first
-time you run the program with the following format:
+PoolRank reads match results from `pool.csv`. This file will be generated the
+first time you run the program with the following format:
 
     player1,player2,result
 
-You can record game result directly to `pool.csv` by editing the result number
-at the end of each line, providing 0 = unplayed, 1 = win, -1 = lose.
+You can record your match result directly to `pool.csv` by editing the number
+at the end of each line, providing that `0 = unplayed, 1 = win, -1 = lose`.
 
 License
 -------
