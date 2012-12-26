@@ -12,16 +12,13 @@ def generate_config_file()
 end
 
 def load_config_file()
-  configs = YAML.load_file(CFGFILE)
-  configs[:company] = configs["company"].upcase
-  configs[:players] = configs["players"].map(&:upcase)
-  configs
+  YAML.load_file(CFGFILE)
 end
 
 def generate_save_file()
   results = []
   configs = load_config_file()
-  configs[:players].combination(2).each do |player1, player2|
+  configs["players"].combination(2).each do |player1, player2|
     results << [player1, player2, 0]
   end
   save_to_file(results)
@@ -67,7 +64,7 @@ end
 def initialize_stats()
   stats = {}
   configs = load_config_file()
-  configs[:players].each do |player|
+  configs["players"].each do |player|
     stats[player] = Hash.new(0)
   end
   stats
@@ -80,18 +77,18 @@ def current_standings()
   sorted_stats = stats.sort_by { |_, value| value["points"] }
   sorted_stats.reverse!
 
-  puts
-  puts "#{configs[:company]} POOL TOURNAMENT".center(39)
-  puts "CURRENT STANDINGS".center(39)
-  puts
-  puts " POS | PLAYER | WINS | LOSES | POINTS "
-  puts "-----+--------+------+-------+--------"
+  disp
+  disp "#{configs["company"]} POOL TOURNAMENT".center(38)
+  disp "CURRENT STANDINGS".center(38)
+  disp
+  disp " POS | PLAYER | WINS | LOSES | POINTS "
+  disp "-----+--------+------+-------+--------"
   sorted_stats.each_with_index do |(player, pstats), index|
     wins, loses, points = pstats.values_at("wins", "loses", "points")
     template = " %3s | %-6s | %4s | %5s | %6s "
-    puts template % [index+1, player, wins, loses, points]
+    disp template % [index+1, player, wins, loses, points]
   end
-  puts
+  disp
 end
 
 def match_results()
@@ -99,18 +96,18 @@ def match_results()
   results = load_save_file()
   unplayed = results.select { |_, _, result| !result.zero? }
 
-  puts
-  puts "#{configs[:company]} POOL TOURNAMENT".center(39)
-  puts "MATCH RESULTS".center(39)
-  puts
-  puts " NO. | MATCH                 | WINNER "
-  puts "-----+-----------------------+--------"
+  disp
+  disp "#{configs["company"]} POOL TOURNAMENT".center(38)
+  disp "MATCH RESULTS".center(38)
+  disp
+  disp " NO. | MATCH                 | WINNER "
+  disp "-----+-----------------------+--------"
   unplayed.each_with_index do |(player1, player2, result), index|
     versus = [player1, player2].join(" vs ")
     winner = result > 0 ? player1 : player2
-    puts " %3s | %-21s | %-6s " % [index+1, versus, winner]
+    disp " %3s | %-21s | %-6s " % [index+1, versus, winner]
   end
-  puts
+  disp
 end
 
 def remaining_matches()
@@ -118,17 +115,23 @@ def remaining_matches()
   results = load_save_file()
   unplayed = results.select { |_, _, result| result.zero? }
 
-  puts
-  puts "#{configs[:company]} POOL TOURNAMENT".center(39)
-  puts "REMAINING MATCHES".center(39)
-  puts
-  puts " NO. | MATCH                          "
-  puts "-----+--------------------------------"
+  disp
+  disp "#{configs["company"]} POOL TOURNAMENT".center(38)
+  disp "REMAINING MATCHES".center(38)
+  disp
+  disp " NO. | MATCH                          "
+  disp "-----+--------------------------------"
   unplayed.each_with_index do |(player1, player2, _), index|
     versus = [player1, player2].join(" vs ")
-    puts " %3s | %-21s" % [index+1, versus]
+    disp " %3s | %-21s" % [index+1, versus]
   end
-  puts
+  disp
+end
+
+def disp(text=nil)
+  indent = "  "
+  text = (indent << text).upcase unless text.nil?
+  puts text
 end
 
 def main()

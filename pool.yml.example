@@ -1,3 +1,5 @@
+# Sample configuration file for PoolRank.
+# Please keep all player names under six characters.
 ---
 company: oozou
 players:
