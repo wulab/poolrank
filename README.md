@@ -10,10 +10,26 @@ Clone the PoolRank repo at the command prompt:
 
     $ git clone git://github.com/oozou/poolrank.git
 
-Change directory to `poolrank` and run the program:
+Change directory to `poolrank` and create a config file:
 
     $ cd poolrank
+    $ cp pool.yml.example pool.yml
+
+Then, run the program:
+
     $ ruby pool.rb
+
+Player List
+-----------
+
+Player list resides in `pool.yml`. You can edit the file to add/remove player
+and regenerate a new set of matches by:
+
+    $ rm pool.csv
+    $ ruby pool.rb
+
+Please beware that this will remove any previous result. If you want to update
+the list during a tournament, please backup `pool.csv` file before doing so.
 
 Recording Results
 -----------------
