@@ -5,10 +5,10 @@ CFGFILE = __FILE__.sub(File.extname(__FILE__), ".yml")
 SAVFILE = __FILE__.sub(File.extname(__FILE__), ".csv")
 
 def generate_config_file()
-  file = File.new(CFGFILE, "w")
-  data = {"company" => "dummy", "players" => ["foo", "bar"]}
-  YAML.dump(data, file)
-  file.close()
+  File.open(CFGFILE, "w") do |file|
+    data = {"company" => "dummy", "players" => ["foo", "bar"]}
+    YAML.dump(data, file)
+  end
 end
 
 def load_config_file()
@@ -25,22 +25,25 @@ def generate_save_file()
 end
 
 def save_to_file(results)
-  file = File.new(SAVFILE, "w")
-  results.each do |match|
-    file.write(match.join(",") + "\n")
+  File.open(SAVFILE, "w") do |file|
+    results.each do |match|
+      file.write(match.join(",") + "\n")
+    end
   end
-  file.close()
 end
 
 def load_save_file()
   results = []
-  file = File.open(SAVFILE, "r")
-  file.each_line do |line|
-    player1, player2, result = line.chomp.split(",")
-    results << [player1, player2, result.to_i]
+  File.open(SAVFILE, "r") do |file|
+    file.each do |line|
+      player1, player2, result = line.chomp.split(",")
+      results << [player1, player2, result.to_i]
+    end
   end
   results
 end
+
+########################################
 
 def calculate_stats(results)
   stats = initialize_stats()
@@ -69,6 +72,14 @@ def initialize_stats()
   end
   stats
 end
+
+def disp(text=nil)
+  indent = "  "
+  text = (indent << text).upcase unless text.nil?
+  puts text
+end
+
+########################################
 
 def current_standings()
   configs = load_config_file()
@@ -128,11 +139,7 @@ def remaining_matches()
   disp
 end
 
-def disp(text=nil)
-  indent = "  "
-  text = (indent << text).upcase unless text.nil?
-  puts text
-end
+########################################
 
 def main()
   generate_config_file() unless File.exist?(CFGFILE)
