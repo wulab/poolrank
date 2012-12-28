@@ -64,6 +64,12 @@ def calculate_stats(results)
   stats
 end
 
+def assign_rankings(stats)
+  stats.sort_by do |player, player_stats|
+    [-player_stats["points"], -player_stats["wins"], player]
+  end
+end
+
 def initialize_stats()
   stats = {}
   configs = load_config_file()
@@ -84,9 +90,7 @@ end
 def current_standings()
   configs = load_config_file()
   results = load_save_file()
-  stats = calculate_stats(results)
-  sorted_stats = stats.sort_by { |_, value| value["points"] }
-  sorted_stats.reverse!
+  rankings = assign_rankings(calculate_stats(results))
 
   disp
   disp "#{configs["company"]} POOL TOURNAMENT".center(38)
@@ -94,8 +98,8 @@ def current_standings()
   disp
   disp " POS | PLAYER | WINS | LOSES | POINTS "
   disp "-----+--------+------+-------+--------"
-  sorted_stats.each_with_index do |(player, pstats), index|
-    wins, loses, points = pstats.values_at("wins", "loses", "points")
+  rankings.each_with_index do |(player, player_stats), index|
+    wins, loses, points = player_stats.values_at("wins", "loses", "points")
     template = " %3s | %-6s | %4s | %5s | %6s "
     disp template % [index+1, player, wins, loses, points]
   end
