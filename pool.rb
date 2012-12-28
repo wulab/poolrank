@@ -150,16 +150,71 @@ def remaining_matches()
   disp
 end
 
-########################################
-
-def main()
-  generate_data_file() unless File.exist?(DATAFILE)
-  generate_matches() unless matches_generated?()
+def summary()
   current_standings()
   match_results()
   remaining_matches()
 end
 
+########################################
+
+def usage()
+  puts(<<-EOF)
+Usage: ruby #{File.basename(__FILE__)} <command>
+
+Available commands are:
+  init        Create an initial data file, overwrite existing one
+  new         Generate new tournament matches from data file
+  show        Display tournament summary
+  standings   Display current standings table
+  results     Display past match results
+  matches     Display remaining unplayed matches
+
+  EOF
+end
+
+def error(message)
+  $stderr.puts(message)
+  exit(false)
+end
+
+def check_data_file()
+  unless File.exist?(DATAFILE)
+    error "#{File.basename(__FILE__)}: Data file does not exist. " +
+          "See 'ruby #{File.basename(__FILE__)} help'."
+  end
+end
+
+def check_requirements()
+  check_data_file()
+  unless matches_generated?()
+    error "#{File.basename(__FILE__)}: No matches in data file. " +
+          "See 'ruby #{File.basename(__FILE__)} help'."
+  end
+end
+
 if __FILE__ == $0
-  main()
+  case ARGV[0]
+  when nil, "help"
+    usage()
+  when "init"
+    generate_data_file()
+  when "new"
+    check_data_file()
+    generate_matches()
+  when "show"
+    check_requirements()
+    summary()
+  when "standings"
+    check_requirements()
+    current_standings()
+  when "results"
+    check_requirements()
+    match_results()
+  when "matches"
+    check_requirements()
+    remaining_matches()
+  else
+    error("#{File.basename(__FILE__)}: '#{ARGV[0]}' is not a valid command.")
+  end
 end
