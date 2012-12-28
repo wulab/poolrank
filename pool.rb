@@ -1,53 +1,60 @@
 #!/usr/bin/env ruby
 require 'yaml'
 
-CFGFILE = __FILE__.sub(File.extname(__FILE__), ".yml")
-SAVFILE = __FILE__.sub(File.extname(__FILE__), ".csv")
+DATAFILE = __FILE__.sub(File.extname(__FILE__), ".yml")
 
-def generate_config_file()
-  File.open(CFGFILE, "w") do |file|
-    data = {"company" => "dummy", "players" => ["foo", "bar"]}
+def load_data()
+  YAML.load_file(DATAFILE)
+end
+
+def save_data(data)
+  File.open(DATAFILE, "w") do |file|
     YAML.dump(data, file)
   end
 end
 
-def load_config_file()
-  YAML.load_file(CFGFILE)
+def generate_data_file()
+  data = {"company" => "dummy", "players" => ["foo", "bar"]}
+  save_data(data)
 end
 
-def generate_save_file()
-  results = []
-  configs = load_config_file()
-  configs["players"].combination(2).each do |player1, player2|
-    results << [player1, player2, 0]
+def generate_matches()
+  data = load_data()
+  data["matches"] = []
+  data["players"].combination(2).each do |player1, player2|
+    data["matches"] << [player1, player2, 0].join(",")
   end
-  save_to_file(results)
+  save_data(data)
 end
 
-def save_to_file(results)
-  File.open(SAVFILE, "w") do |file|
-    results.each do |match|
-      file.write(match.join(",") + "\n")
-    end
-  end
+def matches_generated?()
+  data = load_data()
+  !data["matches"].nil?
 end
 
-def load_save_file()
-  results = []
-  File.open(SAVFILE, "r") do |file|
-    file.each do |line|
-      player1, player2, result = line.chomp.split(",")
-      results << [player1, player2, result.to_i]
-    end
+def extract_matches(data)
+  matches = []
+  data["matches"].each do |match|
+    player1, player2, result = match.chomp.split(",")
+    matches << [player1, player2, result.to_i]
   end
-  results
+  matches
 end
 
 ########################################
 
-def calculate_stats(results)
+def initialize_stats()
+  stats = {}
+  data = load_data()
+  data["players"].each do |player|
+    stats[player] = Hash.new(0)
+  end
+  stats
+end
+
+def calculate_stats(matches)
   stats = initialize_stats()
-  results.each do |player1, player2, result|
+  matches.each do |player1, player2, result|
     unless result.zero?
       if result > 0
         winner, loser = player1, player2
@@ -70,15 +77,6 @@ def assign_rankings(stats)
   end
 end
 
-def initialize_stats()
-  stats = {}
-  configs = load_config_file()
-  configs["players"].each do |player|
-    stats[player] = Hash.new(0)
-  end
-  stats
-end
-
 def disp(text=nil)
   indent = "  "
   text = (indent << text).upcase unless text.nil?
@@ -88,12 +86,12 @@ end
 ########################################
 
 def current_standings()
-  configs = load_config_file()
-  results = load_save_file()
-  rankings = assign_rankings(calculate_stats(results))
+  data = load_data()
+  matches = extract_matches(data)
+  rankings = assign_rankings(calculate_stats(matches))
 
   disp
-  disp "#{configs["company"]} POOL TOURNAMENT".center(38)
+  disp "#{data["company"]} POOL TOURNAMENT".center(38)
   disp "CURRENT STANDINGS".center(38)
   disp
   disp " POS | PLAYER | WINS | LOSES | POINTS "
@@ -107,12 +105,12 @@ def current_standings()
 end
 
 def match_results()
-  configs = load_config_file()
-  results = load_save_file()
-  unplayed = results.select { |_, _, result| !result.zero? }
+  data = load_data()
+  matches = extract_matches(data)
+  unplayed = matches.select { |_, _, result| !result.zero? }
 
   disp
-  disp "#{configs["company"]} POOL TOURNAMENT".center(38)
+  disp "#{data["company"]} POOL TOURNAMENT".center(38)
   disp "MATCH RESULTS".center(38)
   disp
   disp " NO. | MATCH                 | WINNER "
@@ -126,12 +124,12 @@ def match_results()
 end
 
 def remaining_matches()
-  configs = load_config_file()
-  results = load_save_file()
-  unplayed = results.select { |_, _, result| result.zero? }
+  data = load_data()
+  matches = extract_matches(data)
+  unplayed = matches.select { |_, _, result| result.zero? }
 
   disp
-  disp "#{configs["company"]} POOL TOURNAMENT".center(38)
+  disp "#{data["company"]} POOL TOURNAMENT".center(38)
   disp "REMAINING MATCHES".center(38)
   disp
   disp " NO. | MATCH                          "
@@ -146,8 +144,8 @@ end
 ########################################
 
 def main()
-  generate_config_file() unless File.exist?(CFGFILE)
-  generate_save_file() unless File.exist?(SAVFILE)
+  generate_data_file() unless File.exist?(DATAFILE)
+  generate_matches() unless matches_generated?()
   current_standings()
   match_results()
   remaining_matches()
