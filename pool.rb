@@ -14,8 +14,17 @@ def save_data(data)
 end
 
 def generate_data_file()
-  data = {"company" => "dummy", "players" => ["foo", "bar"]}
-  save_data(data)
+  File.open(DATAFILE, "w") do |file|
+    file.write(<<-EOF)
+# PoolRank initial data file.
+# Please keep player names under six characters.
+---
+company: dummy
+players:
+- foo
+- bar
+    EOF
+  end
 end
 
 def generate_matches()

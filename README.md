@@ -14,22 +14,23 @@ Clone the PoolRank repo at the command prompt:
 
     $ git clone https://github.com/wulab/poolrank.git
 
-Change directory to `poolrank` and create a data file:
+Change directory to `poolrank` and run the program:
 
     $ cd poolrank
-    $ cp pool.yml.example pool.yml
+    $ ruby pool.rb
 
-Then, run the program:
+Edit company and player list in `pool.yml` and run the program again:
 
     $ ruby pool.rb
+
+Tournament matches will be generated in `pool.yml`.
 
 Player List
 -----------
 
-Player list resides in `pool.yml`. This file will be generated the first time
-you run the program. You can edit the file to add/remove player and regenerate
-a new set of matches by removing the matches section from the file. Be sure to
-backup any match results before doing so.
+Player list resides in `pool.yml`. You can edit the file to add/remove player
+and regenerate a new set of matches by removing the matches section from the
+file. Be sure to backup any match results before doing so.
 
 Match Results
 -------------
