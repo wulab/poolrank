@@ -27,6 +27,17 @@ players:
   end
 end
 
+def initialize_data_file()
+  if File.exist?(DATAFILE)
+    print("Data file already exists. Overwrite? (Y/n): ")
+    if $stdin.gets().chomp == "Y"
+      generate_data_file()
+    end
+  else
+    generate_data_file()
+  end
+end
+
 def generate_matches()
   data = load_data()
   data["matches"] = []
@@ -39,6 +50,17 @@ end
 def matches_generated?()
   data = load_data()
   !data["matches"].nil?
+end
+
+def initialize_tournament()
+  if matches_generated?()
+    print("Tournament matches already exist. Overwrite? (Y/n): ")
+    if $stdin.gets().chomp == "Y"
+      generate_matches()
+    end
+  else
+    generate_matches()
+  end
 end
 
 def extract_matches(data)
@@ -163,7 +185,7 @@ def usage()
 Usage: ruby #{File.basename(__FILE__)} <command>
 
 Available commands are:
-  init        Create an initial data file, overwrite existing one
+  init        Create an initial data file
   new         Generate new tournament matches from data file
   show        Display tournament summary
   standings   Display current standings table
@@ -198,10 +220,10 @@ if __FILE__ == $0
   when nil, "help"
     usage()
   when "init"
-    generate_data_file()
+    initialize_data_file()
   when "new"
     check_data_file()
-    generate_matches()
+    initialize_tournament()
   when "show"
     check_requirements()
     summary()
