@@ -1,20 +1,18 @@
 #!/usr/bin/env ruby
 require 'yaml'
 
-DATAFILE = __FILE__.sub(File.extname(__FILE__), ".yml")
-
 def load_data()
-  YAML.load_file(DATAFILE)
+  YAML.load_file($datafile)
 end
 
 def save_data(data)
-  File.open(DATAFILE, "w") do |file|
+  File.open($datafile, "w") do |file|
     YAML.dump(data, file)
   end
 end
 
 def generate_data_file()
-  File.open(DATAFILE, "w") do |file|
+  File.open($datafile, "w") do |file|
     file.write(<<-EOF)
 # PoolRank initial data file.
 # Please keep player names under six characters.
@@ -28,7 +26,7 @@ players:
 end
 
 def initialize_data_file()
-  if File.exist?(DATAFILE)
+  if File.exist?($datafile)
     print("Data file already exists. Overwrite? (Y/n): ")
     if $stdin.gets().chomp == "Y"
       generate_data_file()
@@ -201,7 +199,7 @@ def error(message)
 end
 
 def check_data_file()
-  unless File.exist?(DATAFILE)
+  unless File.exist?($datafile)
     error "#{File.basename(__FILE__)}: Data file does not exist. " +
           "See 'ruby #{File.basename(__FILE__)} help'."
   end
@@ -216,6 +214,8 @@ def check_requirements()
 end
 
 if __FILE__ == $0
+  $datafile = __FILE__.sub(File.extname(__FILE__), ".yml")
+
   case ARGV[0]
   when nil, "help"
     usage()
