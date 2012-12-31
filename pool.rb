@@ -200,16 +200,27 @@ def error(message)
   exit(false)
 end
 
-def check_data_file()
+def ensure_no_arguments()
+  unless $argument.nil?
+    error "'#{$command}' does not take argument."
+  end
+end
+
+def ensure_data_file()
   unless File.exist?($datafile)
     error "'#{File.basename($datafile)}' does not exist."
   end
 end
 
-def check_requirements()
-  check_data_file()
+def ensure_matches_generated()
   unless matches_generated?()
-    error "No matches in '#{File.basename($datafile)}'."
+    error "No generated matches in '#{File.basename($datafile)}'."
+  end
+end
+
+def check_requirements(*requirements)
+  requirements.each do |requirement|
+    send("ensure_#{requirement}".to_sym)
   end
 end
 
@@ -226,25 +237,26 @@ if __FILE__ == $0
   when nil, "help"
     usage()
   when "init"
+    check_requirements(:no_arguments)
     initialize_data_file()
   when "new"
-    check_data_file()
+    check_requirements(:no_arguments, :data_file)
     initialize_tournament()
   when "show"
     reassign_data_file($argument)
-    check_requirements()
+    check_requirements(:data_file, :matches_generated)
     summary()
   when "standings"
     reassign_data_file($argument)
-    check_requirements()
+    check_requirements(:data_file, :matches_generated)
     current_standings()
   when "results"
     reassign_data_file($argument)
-    check_requirements()
+    check_requirements(:data_file, :matches_generated)
     match_results()
   when "matches"
     reassign_data_file($argument)
-    check_requirements()
+    check_requirements(:data_file, :matches_generated)
     remaining_matches()
   else
     error("'#{$command}' is not a valid command.")
