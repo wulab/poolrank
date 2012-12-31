@@ -114,9 +114,7 @@ def disp(text=nil)
   puts text
 end
 
-########################################
-
-def current_standings()
+def display_standings()
   data = load_data()
   matches = extract_matches(data)
   rankings = assign_rankings(calculate_stats(matches))
@@ -135,7 +133,7 @@ def current_standings()
   disp
 end
 
-def match_results()
+def display_results()
   data = load_data()
   matches = extract_matches(data)
   unplayed = matches.select { |_, _, result| !result.zero? }
@@ -154,7 +152,7 @@ def match_results()
   disp
 end
 
-def remaining_matches()
+def display_matches()
   data = load_data()
   matches = extract_matches(data)
   unplayed = matches.select { |_, _, result| result.zero? }
@@ -172,10 +170,10 @@ def remaining_matches()
   disp
 end
 
-def summary()
-  current_standings()
-  match_results()
-  remaining_matches()
+def display_tables(*tables)
+  tables.each do |table|
+    send("display_#{table}".to_sym)
+  end
 end
 
 ########################################
@@ -261,19 +259,11 @@ if __FILE__ == $0
   when "show"
     reassign_data_file($argument)
     check_requirements(:data_file, :matches_generated)
-    summary()
-  when "standings"
+    display_tables(:standings, :results, :matches)
+  when "standings", "results", "matches"
     reassign_data_file($argument)
     check_requirements(:data_file, :matches_generated)
-    current_standings()
-  when "results"
-    reassign_data_file($argument)
-    check_requirements(:data_file, :matches_generated)
-    match_results()
-  when "matches"
-    reassign_data_file($argument)
-    check_requirements(:data_file, :matches_generated)
-    remaining_matches()
+    display_tables($command)
   else
     error("'#{$command}' is not a valid command.")
   end
