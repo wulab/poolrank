@@ -180,7 +180,7 @@ end
 
 def usage()
   puts(<<-EOF)
-Usage: ruby #{File.basename(__FILE__)} <command>
+Usage: ruby #{File.basename(__FILE__)} <command> [<args>]
 
 Available commands are:
   init        Create an initial data file
@@ -194,29 +194,35 @@ Available commands are:
 end
 
 def error(message)
-  $stderr.puts(message)
+  format = "%{program}: %{message} See 'ruby %{program} help'."
+  program = File.basename(__FILE__)
+  warn(format % {:program => program, :message => message})
   exit(false)
 end
 
 def check_data_file()
   unless File.exist?($datafile)
-    error "#{File.basename(__FILE__)}: Data file does not exist. " +
-          "See 'ruby #{File.basename(__FILE__)} help'."
+    error "'#{File.basename($datafile)}' does not exist."
   end
 end
 
 def check_requirements()
   check_data_file()
   unless matches_generated?()
-    error "#{File.basename(__FILE__)}: No matches in data file. " +
-          "See 'ruby #{File.basename(__FILE__)} help'."
+    error "No matches in '#{File.basename($datafile)}'."
   end
 end
 
+def reassign_data_file(path)
+  $datafile = path if !path.nil?
+end
+
 if __FILE__ == $0
+  $command = ARGV.shift
+  $argument = ARGV.shift
   $datafile = __FILE__.sub(File.extname(__FILE__), ".yml")
 
-  case ARGV[0]
+  case $command
   when nil, "help"
     usage()
   when "init"
@@ -225,18 +231,22 @@ if __FILE__ == $0
     check_data_file()
     initialize_tournament()
   when "show"
+    reassign_data_file($argument)
     check_requirements()
     summary()
   when "standings"
+    reassign_data_file($argument)
     check_requirements()
     current_standings()
   when "results"
+    reassign_data_file($argument)
     check_requirements()
     match_results()
   when "matches"
+    reassign_data_file($argument)
     check_requirements()
     remaining_matches()
   else
-    error("#{File.basename(__FILE__)}: '#{ARGV[0]}' is not a valid command.")
+    error("'#{$command}' is not a valid command.")
   end
 end

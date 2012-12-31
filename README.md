@@ -50,6 +50,18 @@ written in the following format:
 You can record your match result directly to `pool.yml` by editing the number
 at the end of each line, providing that `0 = unplayed, 1 = win, -1 = lose`.
 
+Data File
+---------
+
+For display commands (e.g. show, standings), you can specify external data
+file as an optional argument to the command:
+
+	$ ruby pool.rb show company.yml
+	$ ruby pool.rb standings /path/to/file/pool.yml
+
+PoolRank will read tournament data from that file instead of the default
+`pool.yml`.
+
 License
 -------
 
