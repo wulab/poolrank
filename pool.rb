@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+require 'open-uri'
+require 'tempfile'
 require 'yaml'
 
 def load_data()
@@ -224,8 +226,22 @@ def check_requirements(*requirements)
   end
 end
 
-def reassign_data_file(path)
-  $datafile = path if !path.nil?
+def reassign_data_file(path_or_uri)
+  if path_or_uri =~ URI.regexp
+    dirname, basename = File.split($datafile)
+    tempfile = Tempfile.new(basename, dirname)
+
+    begin
+      IO.copy_stream(open(path_or_uri), tempfile)
+      $datafile = tempfile.path()
+    rescue
+      error("Error retrieving '#{path_or_uri}'.")
+    ensure
+      tempfile.close()
+    end
+  elsif !path_or_uri.nil?
+    $datafile = path_or_uri
+  end
 end
 
 if __FILE__ == $0

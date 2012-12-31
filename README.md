@@ -59,8 +59,13 @@ file as an optional argument to the command:
 	$ ruby pool.rb show company.yml
 	$ ruby pool.rb standings /path/to/file/pool.yml
 
-PoolRank will read tournament data from that file instead of the default
-`pool.yml`.
+Or, specify a URL that returns YAML content:
+
+	$ ruby pool.rb show https://gist.github.com/raw/4418643
+
+This will tell PoolRank to read tournament data from given source instead of
+the default `pool.yml`. In this mode, the program will behave as a read-only
+client and expect match results to be present in the source.
 
 License
 -------
