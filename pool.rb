@@ -1,4 +1,12 @@
 #!/usr/bin/env ruby
+#
+# PoolRank
+# Pool game matchmaking, score keeping, and player ranking.
+# https://github.com/wulab/poolrank
+#
+# Copyright (c) 2012 Weera Wu
+# Released under the MIT license
+#
 require 'open-uri'
 require 'tempfile'
 require 'yaml'
